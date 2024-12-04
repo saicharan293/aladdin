@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-const GAME_HEIGHT = 700
+const GAME_HEIGHT = 600
 const GAME_WIDTH = 1100
 const CARPET_SIZE = 100
 const WEAPON_SIZE = 40
@@ -80,8 +80,8 @@ const Game = () => {
                         carpetBox.top < weaponBox.bottom && 
                         carpetBox.bottom > weaponBox.top
                     ){
-                        const overlapX = Math.min( carpetBox.right - weaponBox.left, weaponBox.right - carpetBox.left)
-                        const overlapY = Math.min( carpetBox.bottom - weaponBox.top, weaponBox.bottom - carpetBox.top)
+                        const overlapX = Math.max( carpetBox.right - weaponBox.left, weaponBox.right - carpetBox.left)
+                        const overlapY = Math.max( carpetBox.bottom - weaponBox.top, weaponBox.bottom - carpetBox.top)
                         if(overlapX > 10 && overlapY > 10){
                             setGameOver(true)
                             if(audioRef.current){
