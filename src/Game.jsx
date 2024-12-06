@@ -160,19 +160,22 @@ const Game = () => {
           @import url('https://fonts.googleapis.com/css2?family=Merienda:wght@400;700&display=swap');
           
         `}
-      </style>
-    <div className='flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 p-4'>
-        <div className='relative w-[1100px] h-[600px] overflow-hidden rounded-lg shadow-2xl border-4 border-yellow-400'
+    </style>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 p-4">
+        <div 
+            className="relative w-full max-w-5xl h-[60vw] max-h-[600px] overflow-hidden rounded-lg shadow-2xl border-4 border-yellow-400"
             style={{
                 backgroundImage: "url('https://img.freepik.com/premium-vector/muslim-city-buildings_18591-72466.jpg')",
                 backgroundSize: 'cover',
                 backgroundPosition: `${-score}px 0`
             }}
         >
-            <div className="absolute top-4 right-4 text-2xl font-bold text-white bg-purple-900 bg-opacity-75 p-3 rounded-lg">
+            {/* Score Display */}
+            <div className="absolute top-4 right-4 text-lg sm:text-2xl font-bold text-white bg-purple-900 bg-opacity-75 p-2 sm:p-3 rounded-lg">
                 Score: {score}
             </div>
 
+            {/* Aladdin on the Carpet */}
             <div 
                 className="absolute transition-all duration-100"
                 style={{
@@ -180,47 +183,58 @@ const Game = () => {
                     width: `${CARPET_SIZE}px`,
                     height: `${CARPET_SIZE}px`,
                 }}
-                >
+            >
                 <div className="relative w-full h-full">
                     <img 
                         src="https://media.tenor.com/WsRClBipMacAAAAi/santosh-dawar-aladdin.gif" 
                         alt="Aladdin" 
-                        className='w-full h-full object-contain'/>
+                        className="w-full h-full object-contain"
+                    />
                 </div>
             </div>
+
+            {/* Weapons */}
             {weapons.map((weapon, index) => (
                 <div
                     key={index}
                     className="absolute"
                     style={{
-                    transform: `translate(${weapon.x}px, ${weapon.y}px) rotate(${weapon.rotation}deg)`,
-                    width: `${WEAPON_SIZE}px`,
-                    height: `${WEAPON_SIZE}px`,
+                        transform: `translate(${weapon.x}px, ${weapon.y}px) rotate(${weapon.rotation}deg)`,
+                        width: `${WEAPON_SIZE}px`,
+                        height: `${WEAPON_SIZE}px`,
                     }}
                 >
                     <img 
-                    src="https://nicolaoveragdd.wordpress.com/wp-content/uploads/2014/11/sprites-rock.png" 
-                    alt="Weapon"
-                    className="w-full h-full object-contain animate-spin"
+                        src="https://nicolaoveragdd.wordpress.com/wp-content/uploads/2014/11/sprites-rock.png" 
+                        alt="Weapon"
+                        className="w-full h-full object-contain animate-spin"
                     />
                 </div>
             ))}
 
+            {/* Game Over Modal */}
             {gameOver && (
                 <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center">
-                    <div className="text-center text-white p-8 bg-purple-900 rounded-lg shadow-2xl">
-                        <h2 className="text-4xl font-bold mb-4">Game Over!</h2>
-                        <p className="text-2xl mb-6">Final Score: {score}</p>
-                        <button className="px-6 py-3 bg-yellow-400 text-purple-900 text-xl font-bold hover:bg-yellow-300 transition-colors shadow-lg" onClick={resetGame}>Play Again</button>
+                    <div className="text-center text-white p-4 sm:p-8 bg-purple-900 rounded-lg shadow-2xl">
+                        <h2 className="text-2xl sm:text-4xl font-bold mb-2 sm:mb-4">Game Over!</h2>
+                        <p className="text-xl sm:text-2xl mb-4 sm:mb-6">Final Score: {score}</p>
+                        <button 
+                            className="px-4 sm:px-6 py-2 sm:py-3 bg-yellow-400 text-purple-900 text-lg sm:text-xl font-bold hover:bg-yellow-300 transition-colors shadow-lg"
+                            onClick={resetGame}
+                        >
+                            Play Again
+                        </button>
                     </div>
                 </div>
             )}
 
-            <div className="absolute bottom-4 left-4 text-white bg-purple-900 bg-opacity-75 p-3 rounded-lg shadow-lg">
-                 Use ⬆ and ⬇ arrows to move
+            {/* Instructions */}
+            <div className="absolute bottom-4 left-4 text-xs sm:text-sm text-white bg-purple-900 bg-opacity-75 p-2 sm:p-3 rounded-lg shadow-lg">
+                Use ⬆ and ⬇ arrows to move
             </div>
         </div>
     </div>
+
     </>
   )
 }
