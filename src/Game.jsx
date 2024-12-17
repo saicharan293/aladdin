@@ -16,6 +16,8 @@ const Game = () => {
     const [isMovingUp, setIsMovingUp] = useState(false)
     const [isMovingDown, setIsMovingDown] = useState(false)
     const [speed, setSpeed] = useState(INITIAL_SPEED)
+    const [isGameStarted, setIsGameStarted] = useState(false)
+    const [isPaused, setIsPaused] = useState(false);
 
     const gameLoogRef = useRef(null)
     const audioRef = useRef( null)
@@ -23,11 +25,11 @@ const Game = () => {
     useEffect(()=>{
         audioRef.current = new Audio('/bg.mp3')
         audioRef.current.loop = true;
-        const startMusic = () => {
-            audioRef.current.play()
-            document.removeEventListener('keydown', startMusic)
-        }
-        document.addEventListener('keydown', startMusic)
+        // const startMusic = () => {
+        //     audioRef.current.play()
+        //     document.removeEventListener('keydown', startMusic)
+        // }
+        // document.addEventListener('keydown', startMusic)
         return ()=>{
             if(audioRef.current){
                 audioRef.current.pause()
@@ -37,7 +39,7 @@ const Game = () => {
     },[])
 
     useEffect(()=>{
-        if(gameOver) return
+        if(gameOver || !isGameStarted || isPaused) return
         gameLoogRef.current = setInterval(() => {
             setScore(prev => prev + 1 )
             setSpeed(prev => prev + SPEED_INCREMENT)
@@ -101,7 +103,7 @@ const Game = () => {
                 clearInterval(gameLoogRef.current)
             }
         }
-    },[gameOver, speed])
+    },[gameOver, speed, isGameStarted, isPaused])
 
     const handleKeyDown = useCallback((e)=>{
         if(e.key === 'ArrowUp') setIsMovingUp(true)
@@ -119,15 +121,34 @@ const Game = () => {
         setGameOver(false)
         setScore(0)
         setSpeed(INITIAL_SPEED)
+        setIsGameStarted(true)
+        setIsPaused(false);
         if(audioRef.current){
             audioRef.current.currentTime = 0
             audioRef.current.play()
         }
     }
+    const togglePause = () => {
+        setIsPaused(prev => !prev);
+        if (audioRef.current) {
+            if (!isPaused) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play();
+            }
+        }
+    };
+
+    const startGame = () => {
+        setIsGameStarted(true)
+        if (audioRef.current) {
+            audioRef.current.currentTime = 0;
+            audioRef.current.play()
+        }
+    }
 
     useEffect(()=>{
-
-        if(gameOver) return
+        if(gameOver || !isGameStarted || isPaused) return
         const moveInterval = setInterval(() => {
             setCarpetPosition((prev)=>{
                 let newY = prev.y
@@ -142,7 +163,7 @@ const Game = () => {
             })
         }, 16);
         return ()=> clearInterval(moveInterval)
-    },[isMovingDown, isMovingUp, gameOver])
+    },[isMovingDown, isMovingUp, gameOver, isGameStarted, isPaused])
 
     useEffect(()=>{
         window.addEventListener('keydown', handleKeyDown)
@@ -161,7 +182,18 @@ const Game = () => {
           
         `}
     </style>
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 p-4">
+    <div className="flex relative flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 p-4">
+    {!isGameStarted && !gameOver && (
+        <div className="text-center absolute top-44 z-10 text-white p-2 bg-purple-900 rounded-lg shadow-2xl">
+            <h4 className=" sm:text-4xl font-bold mb-1">Welcome to the Game!</h4>
+            <button 
+                className="px-3 py-2 bg-yellow-400 rounded-md text-purple-900 text-lg sm:text-xl font-bold hover:bg-yellow-300 transition-colors shadow-lg"
+                onClick={startGame}
+            >
+                Start Game
+            </button>
+        </div>
+    )}
         <div 
             className="relative w-full max-w-5xl h-[60vw] max-h-[600px] overflow-hidden rounded-lg shadow-2xl border-4 border-yellow-400"
             style={{
@@ -169,32 +201,42 @@ const Game = () => {
                 backgroundSize: 'cover',
                 backgroundPosition: `${-score}px 0`
             }}
-        >
+        >   
             {/* Score Display */}
-            <div className="absolute top-4 right-4 text-lg sm:text-2xl font-bold text-white bg-purple-900 bg-opacity-75 p-2 sm:p-3 rounded-lg">
-                Score: {score}
-            </div>
+            {isGameStarted && (
+                <div className="absolute flex flex-col top-4 right-4 text-lg sm:text-2xl font-bold text-white bg-purple-900 bg-opacity-75 p-2 sm:p-3 rounded-lg">
+                    Score: {score}
+                    <button 
+                        className="mt-2 px-2 py-1 text-purple-900 text-sm sm:text-lg font-bold hover:bg-yellow-300 transition-colors shadow-lg"
+                        onClick={togglePause}
+                    >
+                        {isPaused ? "▶" : "⏸"}
+                    </button>
+                </div>
+            )}
 
             {/* Aladdin on the Carpet */}
-            <div 
-                className="absolute transition-all duration-100"
-                style={{
-                    transform: `translate(${carpetPosition.x}px, ${carpetPosition.y}px)`,
-                    width: `${CARPET_SIZE}px`,
-                    height: `${CARPET_SIZE}px`,
-                }}
-            >
-                <div className="relative w-full h-full">
-                    <img 
-                        src="https://media.tenor.com/WsRClBipMacAAAAi/santosh-dawar-aladdin.gif" 
-                        alt="Aladdin" 
-                        className="w-full h-full object-contain"
-                    />
+            {isGameStarted && !gameOver && (
+                <div 
+                    className="absolute transition-all duration-100"
+                    style={{
+                        transform: `translate(${carpetPosition.x}px, ${carpetPosition.y}px)`,
+                        width: `${CARPET_SIZE}px`,
+                        height: `${CARPET_SIZE}px`,
+                    }}
+                >
+                    <div className="relative w-full h-full">
+                        <img 
+                            src="https://media.tenor.com/WsRClBipMacAAAAi/santosh-dawar-aladdin.gif" 
+                            alt="Aladdin" 
+                            className="w-full h-full object-contain"
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Weapons */}
-            {weapons.map((weapon, index) => (
+            {isGameStarted && weapons.map((weapon, index) => (
                 <div
                     key={index}
                     className="absolute"
@@ -219,7 +261,7 @@ const Game = () => {
                         <h2 className="text-2xl sm:text-4xl font-bold mb-2 sm:mb-4">Game Over!</h2>
                         <p className="text-xl sm:text-2xl mb-4 sm:mb-6">Final Score: {score}</p>
                         <button 
-                            className="px-4 sm:px-6 py-2 sm:py-3 bg-yellow-400 text-purple-900 text-lg sm:text-xl font-bold hover:bg-yellow-300 transition-colors shadow-lg"
+                            className="px-4 sm:px-6 py-2 sm:py-3 rounded-md bg-yellow-400 text-purple-900 text-lg sm:text-xl font-bold hover:bg-yellow-300 transition-colors shadow-lg"
                             onClick={resetGame}
                         >
                             Play Again
@@ -229,9 +271,11 @@ const Game = () => {
             )}
 
             {/* Instructions */}
+            {isGameStarted && !gameOver && (
             <div className="absolute bottom-4 left-4 text-xs sm:text-sm text-white bg-purple-900 bg-opacity-75 p-2 sm:p-3 rounded-lg shadow-lg">
                 Use ⬆ and ⬇ arrows to move
             </div>
+            )}
         </div>
     </div>
 
