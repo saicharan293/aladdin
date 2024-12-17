@@ -58,41 +58,46 @@ const Game = () => {
                     })
                 }
 
-                for (const weapon of moved){
-                    const HORIZONTAL_PADDING = 30
-                    const TOP_PADDING = 15
-                    const BOTTOM_PADDING = 30
-
+                for (const weapon of moved) {
+                    const HORIZONTAL_PADDING = 10; // Adjusted for closer collisions
+                    const VERTICAL_PADDING = 10; // Adjusted for closer collisions
+                
                     const carpetBox = {
-                        left: carpetPosition.x + HORIZONTAL_PADDING, 
+                        left: carpetPosition.x + HORIZONTAL_PADDING,
                         right: carpetPosition.x + CARPET_SIZE - HORIZONTAL_PADDING,
-                        top: carpetPosition.y + TOP_PADDING,
-                        bottom: carpetPosition.y + CARPET_SIZE - BOTTOM_PADDING
-                    }
-
-                    const weaponBox ={
-                        left: weapon.x + 10, 
+                        top: carpetPosition.y + VERTICAL_PADDING,
+                        bottom: carpetPosition.y + CARPET_SIZE - VERTICAL_PADDING,
+                    };
+                
+                    const weaponBox = {
+                        left: weapon.x + 10,
                         right: weapon.x + WEAPON_SIZE - 10,
                         top: weapon.y + 10,
-                        bottom: weapon.y + WEAPON_SIZE - 10
-                    }
-                    if(
-                        carpetBox.left < weaponBox.right && 
+                        bottom: weapon.y + WEAPON_SIZE - 10,
+                    };
+                
+                    // Check for collision
+                    if (
+                        carpetBox.left < weaponBox.right &&
                         carpetBox.right > weaponBox.left &&
-                        carpetBox.top < weaponBox.bottom && 
+                        carpetBox.top < weaponBox.bottom &&
                         carpetBox.bottom > weaponBox.top
-                    ){
-                        const overlapX = Math.max( carpetBox.right - weaponBox.left, weaponBox.right - carpetBox.left)
-                        const overlapY = Math.max( carpetBox.bottom - weaponBox.top, weaponBox.bottom - carpetBox.top)
-                        if(overlapX > 10 && overlapY > 10){
-                            setGameOver(true)
-                            if(audioRef.current){
-                                audioRef.current.pause()
+                    ) {
+                        const overlapX = Math.max(0, Math.min(carpetBox.right, weaponBox.right) - Math.max(carpetBox.left, weaponBox.left));
+                        const overlapY = Math.max(0, Math.min(carpetBox.bottom, weaponBox.bottom) - Math.max(carpetBox.top, weaponBox.top));
+                
+                        // Trigger game over if the overlap is significant (adjust threshold as needed)
+                        if (overlapX > 5 && overlapY > 5) {
+                            setGameOver(true);
+                            if (audioRef.current) {
+                                audioRef.current.pause();
                             }
-                            break
+                            break;
                         }
                     }
                 }
+                
+                
 
                 return moved;
 
